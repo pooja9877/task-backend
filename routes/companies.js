@@ -10,7 +10,6 @@ router.post('/scrape', async (req, res) => {
     const { url } = req.body;
   
     try {
-      // Make axios request and puppeteer request concurrently
       const [axiosResponse, puppeteerResponse] = await Promise.all([
         axios.get(url),
         (async () => {
@@ -94,26 +93,7 @@ router.get('/companies/:_id', async (req, res) => {
       res.status(500).json({ error: 'Failed to fetch company details' });
     }
   });
-//   router.get('/api/screenshot', async (req, res) => {
-//     try {
-//       const browser = await puppeteer.launch();
-//       const page = await browser.newPage();
-     
-     
-//       await page.goto(req.body.url, { waitUntil: 'networkidle2' });
-      
-//       // Capture screenshot
-//       const screenshotPath = `public/screenshot_${Date.now()}.png`; 
-//       await page.screenshot({ path: screenshotPath });
-      
-//       await browser.close();
-      
-//       res.json({ screenshotUrl: `http://localhost:5000/${screenshotPath}` }); 
-//     } catch (error) {
-//       console.error('Error capturing screenshot:', error);
-//       res.status(500).json({ message: 'Error capturing screenshot.' });
-//     }
-//   });
+
   
 
 module.exports = router;
