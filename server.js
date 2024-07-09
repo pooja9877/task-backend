@@ -9,7 +9,6 @@ const MONGODB_URI = 'mongodb+srv://nidhidhiman:nidhi123@cluster0.rcko1if.mongodb
 app.use(cors());
 app.use(express.json());
 app.use('/',companyRoutes);
-
 app.use(express.urlencoded({extended: true}))
 app.use('/uploads', express.static('uploads'));
 mongoose.connect(MONGODB_URI,{
