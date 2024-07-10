@@ -78,21 +78,21 @@ router.post("/scrape", async (req, res) => {
     const instagramUrl = $('a[href*="instagram.com"]').attr("href") || "";
 
  
-    const browser = await puppeteer.launch();
-    const page = await browser.newPage();
-    await page.goto(url);
+    // const browser = await puppeteer.launch();
+    // const page = await browser.newPage();
+    // await page.goto(url);
     
    
-    const screenshotFilename = `screenshot_${Date.now()}.png`;
+    // const screenshotFilename = `screenshot_${Date.now()}.png`;
     
    
-    const screenshotPath = path.join(__dirname, '..', 'uploads', screenshotFilename);
+    // const screenshotPath = path.join(__dirname, '..', 'uploads', screenshotFilename);
     
   
-    await page.screenshot({ path: screenshotPath });
+    // await page.screenshot({ path: screenshotPath });
     
     
-    await browser.close();
+    // await browser.close();
 
 
     const newCompany = new Company({
@@ -103,12 +103,12 @@ router.post("/scrape", async (req, res) => {
       linkedinUrl,
       twitterUrl,
       instagramUrl,
-      screenshotPath: `uploads/${screenshotFilename}`,
+      // screenshotPath: `uploads/${screenshotFilename}`,
     });
 
     await newCompany.save();
 
-    res.status(200).json({ message: "Company data scraped and saved successfully!", screenshotPath: `uploads/${screenshotFilename}` });
+    res.status(200).json({ message: "Company data scraped and saved successfully!" });
   } catch (error) {
     console.error("Error scraping:", error);
     res.status(500).send("Error scraping data");
