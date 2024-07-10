@@ -60,16 +60,15 @@ const Company = require("../model/company");
 //     res.status(500).send("Error scraping data");
 //   }
 // });
-
 router.post("/scrape", async (req, res) => {
   const { url } = req.body;
 
   try {
-    // Fetch HTML content from the provided URL
+   
     const axiosResponse = await axios.get(url);
     const $ = cheerio.load(axiosResponse.data);
 
-    // Extract company data from the HTML
+   
     const companyName = $('meta[property="og:site_name"]').attr("content");
     const description = $('meta[name="description"]').attr("content") || "";
     const logoUrl = $("img.logo").first().attr("src") || "";
@@ -78,7 +77,24 @@ router.post("/scrape", async (req, res) => {
     const twitterUrl = $('a[href*="twitter.com"]').attr("href") || "";
     const instagramUrl = $('a[href*="instagram.com"]').attr("href") || "";
 
-    // Create a new Company object using Mongoose model
+ 
+    const browser = await puppeteer.launch();
+    const page = await browser.newPage();
+    await page.goto(url);
+    
+   
+    const screenshotFilename = `screenshot_${Date.now()}.png`;
+    
+   
+    const screenshotPath = path.join(__dirname, '..', 'uploads', screenshotFilename);
+    
+  
+    await page.screenshot({ path: screenshotPath });
+    
+    
+    await browser.close();
+
+
     const newCompany = new Company({
       companyName,
       description,
@@ -87,13 +103,12 @@ router.post("/scrape", async (req, res) => {
       linkedinUrl,
       twitterUrl,
       instagramUrl,
+      screenshotPath: `uploads/${screenshotFilename}`,
     });
 
-    // Save the newCompany object to the database
     await newCompany.save();
 
-    // Respond with success message
-    res.status(200).json({ message: "Company data scraped and saved successfully!" });
+    res.status(200).json({ message: "Company data scraped and saved successfully!", screenshotPath: `uploads/${screenshotFilename}` });
   } catch (error) {
     console.error("Error scraping:", error);
     res.status(500).send("Error scraping data");
