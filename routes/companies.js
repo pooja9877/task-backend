@@ -6,29 +6,70 @@ const puppeteer = require("puppeteer");
 const path = require("path");
 const Company = require("../model/company");
 
+// router.post("/scrape", async (req, res) => {
+//   const { url } = req.body;
+
+//   try {
+//     // const [axiosResponse, puppeteerResponse] = await Promise.all([
+//     //   axios.get(url),
+//     //   (async () => {
+//     //     const browser = await puppeteer.launch();
+//     //     const page = await browser.newPage();
+//     //     await page.goto(url, { waitUntil: "networkidle2" });
+
+//     //     const screenshotPath = `uploads/screenshot_${Date.now()}.png`;
+//     //     // await page.screenshot({
+//     //     //   path: path.resolve(__dirname, "../", screenshotPath),
+//     //     // });
+
+//     //     await browser.close();
+//     //     return screenshotPath;
+//     //   })(),
+//     // ]);
+
+//     const $ = cheerio.load(axiosResponse.data);
+
+//     const companyName = $('meta[property="og:site_name"]').attr("content");
+//     const description = $('meta[name="description"]').attr("content") || "";
+//     const logoUrl = $("img.logo").first().attr("src") || "";
+//     const facebookUrl = $('a[href*="facebook.com"]').attr("href") || "";
+//     const linkedinUrl = $('a[href*="linkedin.com"]').attr("href") || "";
+//     const twitterUrl = $('a[href*="twitter.com"]').attr("href") || "";
+//     const instagramUrl = $('a[href*="instagram.com"]').attr("href") || "";
+
+//     // const screenshotUrl = puppeteerResponse;
+
+//     const newCompany = new Company({
+//       companyName,
+//       description,
+//       logoUrl,
+//       facebookUrl,
+//       linkedinUrl,
+//       twitterUrl,
+//       instagramUrl,
+//       // screenshotUrl,
+//     });
+
+//     await newCompany.save();
+
+//     res
+//       .status(200)
+//       .json({ message: "Company data scraped and saved successfully!" });
+//   } catch (error) {
+//     console.error("Error scraping:", error);
+//     res.status(500).send("Error scraping data");
+//   }
+// });
+
 router.post("/scrape", async (req, res) => {
   const { url } = req.body;
 
   try {
-    // const [axiosResponse, puppeteerResponse] = await Promise.all([
-    //   axios.get(url),
-    //   (async () => {
-    //     const browser = await puppeteer.launch();
-    //     const page = await browser.newPage();
-    //     await page.goto(url, { waitUntil: "networkidle2" });
-
-    //     const screenshotPath = `uploads/screenshot_${Date.now()}.png`;
-    //     // await page.screenshot({
-    //     //   path: path.resolve(__dirname, "../", screenshotPath),
-    //     // });
-
-    //     await browser.close();
-    //     return screenshotPath;
-    //   })(),
-    // ]);
-
+    // Fetch HTML content from the provided URL
+    const axiosResponse = await axios.get(url);
     const $ = cheerio.load(axiosResponse.data);
 
+    // Extract company data from the HTML
     const companyName = $('meta[property="og:site_name"]').attr("content");
     const description = $('meta[name="description"]').attr("content") || "";
     const logoUrl = $("img.logo").first().attr("src") || "";
@@ -37,8 +78,7 @@ router.post("/scrape", async (req, res) => {
     const twitterUrl = $('a[href*="twitter.com"]').attr("href") || "";
     const instagramUrl = $('a[href*="instagram.com"]').attr("href") || "";
 
-    // const screenshotUrl = puppeteerResponse;
-
+    // Create a new Company object using Mongoose model
     const newCompany = new Company({
       companyName,
       description,
@@ -47,20 +87,18 @@ router.post("/scrape", async (req, res) => {
       linkedinUrl,
       twitterUrl,
       instagramUrl,
-      // screenshotUrl,
     });
 
+    // Save the newCompany object to the database
     await newCompany.save();
 
-    res
-      .status(200)
-      .json({ message: "Company data scraped and saved successfully!" });
+    // Respond with success message
+    res.status(200).json({ message: "Company data scraped and saved successfully!" });
   } catch (error) {
     console.error("Error scraping:", error);
     res.status(500).send("Error scraping data");
   }
 });
-
 router.get("/companies", async (req, res) => {
   try {
     const companies = await Company.find();
