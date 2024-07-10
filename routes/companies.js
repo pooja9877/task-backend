@@ -10,22 +10,22 @@ router.post("/scrape", async (req, res) => {
   const { url } = req.body;
 
   try {
-    const [axiosResponse, puppeteerResponse] = await Promise.all([
-      axios.get(url),
-      (async () => {
-        const browser = await puppeteer.launch();
-        const page = await browser.newPage();
-        await page.goto(url, { waitUntil: "networkidle2" });
+    // const [axiosResponse, puppeteerResponse] = await Promise.all([
+    //   axios.get(url),
+    //   (async () => {
+    //     const browser = await puppeteer.launch();
+    //     const page = await browser.newPage();
+    //     await page.goto(url, { waitUntil: "networkidle2" });
 
-        const screenshotPath = `uploads/screenshot_${Date.now()}.png`;
-        // await page.screenshot({
-        //   path: path.resolve(__dirname, "../", screenshotPath),
-        // });
+    //     const screenshotPath = `uploads/screenshot_${Date.now()}.png`;
+    //     // await page.screenshot({
+    //     //   path: path.resolve(__dirname, "../", screenshotPath),
+    //     // });
 
-        await browser.close();
-        return screenshotPath;
-      })(),
-    ]);
+    //     await browser.close();
+    //     return screenshotPath;
+    //   })(),
+    // ]);
 
     const $ = cheerio.load(axiosResponse.data);
 
@@ -37,7 +37,7 @@ router.post("/scrape", async (req, res) => {
     const twitterUrl = $('a[href*="twitter.com"]').attr("href") || "";
     const instagramUrl = $('a[href*="instagram.com"]').attr("href") || "";
 
-    const screenshotUrl = puppeteerResponse;
+    // const screenshotUrl = puppeteerResponse;
 
     const newCompany = new Company({
       companyName,
@@ -47,7 +47,7 @@ router.post("/scrape", async (req, res) => {
       linkedinUrl,
       twitterUrl,
       instagramUrl,
-      screenshotUrl,
+      // screenshotUrl,
     });
 
     await newCompany.save();
